@@ -7,6 +7,9 @@
     <p class="muted">
       Synthèse multi-subventions. Filtre par année, secteur, projet.
     </p>
+    <p class="muted" style="margin-top:6px">
+      Focus : ventilation des charges/produits et synthèse des appels à projets (vue financeur).
+    </p>
 
     <form method="GET" class="grid two">
       <div>
@@ -54,6 +57,8 @@
   </div>
   {% endif %}
 
+  {% set ventilation_rate = (totals.reel_lignes / totals.recu * 100) if totals.recu else 0 %}
+
   <div class="card">
     <h2>Synthèse</h2>
     <div class="kpi">
@@ -61,6 +66,7 @@
       <div class="box"><div class="muted">Attribué</div><div class="v">{{ "%.2f"|format(totals.attribue or 0) }}€</div></div>
       <div class="box"><div class="muted">Reçu</div><div class="v">{{ "%.2f"|format(totals.recu or 0) }}€</div></div>
       <div class="box"><div class="muted">Ventilé (réel lignes)</div><div class="v">{{ "%.2f"|format(totals.reel_lignes or 0) }}€</div></div>
+      <div class="box"><div class="muted">Taux de ventilation</div><div class="v">{{ "%.1f"|format(ventilation_rate) }}%</div></div>
       <div class="box"><div class="muted">Engagé</div><div class="v">{{ "%.2f"|format(totals.engage or 0) }}€</div></div>
       <div class="box"><div class="muted">Reste</div><div class="v">{{ "%.2f"|format(totals.reste or 0) }}€</div></div>
     </div>
