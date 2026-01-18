@@ -10,6 +10,10 @@
 
 {% set stats_open_url = url_for('main.stats', annee=annee_val, secteur=secteur_val, projet_id=projet_val) %}
 {% set bilan_open_url = url_for('main.bilan_global', annee=annee_val, secteur=secteur_val, projet_id=projet_val) %}
+{% set selected_projet_label = None %}
+{% if projets is defined and selected_projet_id %}
+  {% set selected_projet_label = (projets | selectattr('id', 'equalto', selected_projet_id) | map(attribute='nom') | first) %}
+{% endif %}
 
 <div class="stack">
   <div class="card">
@@ -17,9 +21,10 @@
       <div>
         <h1 style="margin-top:0">Stats &amp; bilans</h1>
         <p class="muted" style="margin:0">Un seul écran, deux onglets. Les filtres s'appliquent partout.</p>
+        <p class="muted" style="margin:6px 0 0">Stats = lecture consolidée des charges/produits ventilés. Bilan = synthèse financeur par appel à projets.</p>
       </div>
       <div class="muted" style="max-width:520px; font-size:13px; text-align:right">
-        Astuce : commence par choisir l’année / le secteur / le projet. Ensuite, navigue entre <strong>Stats</strong> et <strong>Bilan</strong> sans perdre ton contexte.
+        Astuce : commence par choisir l’année / le secteur / le projet. Ensuite, navigue entre <strong>Stats</strong> et <strong>Bilan</strong> pour comparer charges, produits et ventilation sans perdre ton contexte.
       </div>
     </div>
 
@@ -67,6 +72,18 @@
         <a class="btn" href="{{ bilan_open_url }}">Ouvrir Bilan ↗</a>
       </div>
     </form>
+
+    <div class="inline" style="margin-top:10px; gap:8px; flex-wrap:wrap;">
+      {% if selected_annee or selected_secteur or selected_projet_id %}
+        {% if selected_annee %}<span class="pill">Année : {{ selected_annee }}</span>{% endif %}
+        {% if selected_secteur %}<span class="pill">Secteur : {{ selected_secteur }}</span>{% endif %}
+        {% if selected_projet_id %}
+          <span class="pill">Projet : {{ selected_projet_label or ('#' ~ selected_projet_id) }}</span>
+        {% endif %}
+      {% else %}
+        <span class="muted" style="font-size:12px;">Aucun filtre actif.</span>
+      {% endif %}
+    </div>
 
     <div class="inline" style="margin-top:12px; gap:10px">
       <button class="pill active" type="button" id="tabStats">📊 Stats</button>
