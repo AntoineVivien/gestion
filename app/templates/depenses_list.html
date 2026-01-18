@@ -3,8 +3,15 @@
 
 <div class="stack">
   <div class="card">
-    <h1>Dépenses</h1>
-    <p class="muted">Ici tu retrouves toutes les dépenses visibles selon ton rôle. Tu peux les éditer ou les supprimer.</p>
+    <div class="card-header">
+      <div>
+        <h1 class="card-title">Dépenses</h1>
+        <p class="card-subtitle">Ici tu retrouves toutes les dépenses visibles selon ton rôle.</p>
+      </div>
+      <div class="inline">
+        <a class="btn ok" href="{{ url_for('budget.depense_new') }}">Nouvelle dépense</a>
+      </div>
+    </div>
 
     {% set totals = namespace(depenses=0) %}
     {% for d in deps %}
@@ -14,21 +21,23 @@
     {% set nb_depenses = deps|length %}
     {% set avg_depense = (total_depenses / nb_depenses) if nb_depenses else 0 %}
 
-    <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:12px;">
-      <div class="card" style="padding:12px;">
+    <div class="spacer"></div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
         <div class="muted">Total filtré</div>
-        <div style="font-size:20px; font-weight:700;">{{ "%.2f"|format(total_depenses or 0) }}€</div>
+        <div class="kpi-value">{{ "%.2f"|format(total_depenses or 0) }}€</div>
       </div>
-      <div class="card" style="padding:12px;">
+      <div class="kpi-card">
         <div class="muted">Nombre de dépenses</div>
-        <div style="font-size:20px; font-weight:700;">{{ nb_depenses }}</div>
+        <div class="kpi-value">{{ nb_depenses }}</div>
       </div>
-      <div class="card" style="padding:12px;">
+      <div class="kpi-card">
         <div class="muted">Moyenne</div>
-        <div style="font-size:20px; font-weight:700;">{{ "%.2f"|format(avg_depense) }}€</div>
+        <div class="kpi-value">{{ "%.2f"|format(avg_depense) }}€</div>
       </div>
     </div>
 
+    <div class="spacer"></div>
     <form method="GET" class="grid two">
       <div>
         <label>Subvention</label>
@@ -56,16 +65,11 @@
 
       <noscript><button class="btn ok" type="submit">Filtrer</button></noscript>
     </form>
-
-    <div class="spacer"></div>
-
-    <div class="inline">
-      <a class="btn ok" href="{{ url_for('budget.depense_new') }}">+ {% if can("depenses:create") %}Nouvelle dépense{% else %}Nouvelle dépense{% endif %}</a>
-    </div>
   </div>
 
   <div class="card">
     <h2>Liste</h2>
+    <p class="muted">Clique sur une dépense pour la modifier ou ajuster son justificatif.</p>
 
     <div class="tablewrap">
       <table>
@@ -81,32 +85,33 @@
           </tr>
         </thead>
         <tbody>
-          {% for d in deps %}
-            {% set l = d.budget_source %}
-            {% set s = l.source_sub %}
-            <tr>
-              <td><strong>{{ s.nom }}</strong><div class="muted">{{ s.secteur }} · {{ s.annee_exercice }}</div></td>
-              <td>{{ l.compte }} · <span class="muted">{{ l.libelle }}</span></td>
-              <td><strong>{{ d.libelle }}</strong></td>
-              <td>{{ "%.2f"|format(d.montant or 0) }}€</td>
-              <td class="muted">{{ d.date_paiement or "" }}</td>
-              <td class="muted">{{ d.type_depense or "" }}</td>
-              <td class="inline">
-                <a class="btn" href="{{ url_for('budget.depense_edit', depense_id=d.id) }}">Éditer</a>
+          {% if deps and deps|length %}
+            {% for d in deps %}
+              {% set l = d.budget_source %}
+              {% set s = l.source_sub %}
+              <tr>
+                <td><strong>{{ s.nom }}</strong><div class="muted">{{ s.secteur }} · {{ s.annee_exercice }}</div></td>
+                <td>{{ l.compte }} · <span class="muted">{{ l.libelle }}</span></td>
+                <td><strong>{{ d.libelle }}</strong></td>
+                <td>{{ "%.2f"|format(d.montant or 0) }}€</td>
+                <td class="muted">{{ d.date_paiement or "" }}</td>
+                <td class="muted">{{ d.type_depense or "" }}</td>
+                <td class="inline">
+                  <a class="btn" href="{{ url_for('budget.depense_edit', depense_id=d.id) }}">Éditer</a>
 
+                  {# Suppression via endpoint dédié (évite un 400 sur depense_edit) #}
+                  {% if can("depenses:delete") %}
+                    <form method="POST" action="{{ url_for('budget.depense_delete', depense_id=d.id) }}" style="display:inline;">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button class="btn danger" type="submit" onclick="return confirm('Supprimer cette dépense ?');">Supprimer</button>
+                    </form>
+                  {% endif %}
 
-				{# Suppression via endpoint dédié (évite un 400 sur depense_edit) #}
-				{% if can("depenses:delete") %}<form method="POST" action="{{ url_for('budget.depense_delete', depense_id=d.id) }}" style="display:inline;">
-				  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-				  <button class="btn danger" type="submit" onclick="return confirm('Supprimer cette dépense ?');">Supprimer</button>
-				</form>{% endif %}
-
-              </td>
-            </tr>
-          {% endfor %}
-
-          {% if deps|length == 0 %}
-            <tr><td colspan="7" class="muted">Aucune dépense.</td></tr>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="7" class="muted">Aucune dépense pour les filtres sélectionnés.</td></tr>
           {% endif %}
         </tbody>
       </table>

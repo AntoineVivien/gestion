@@ -3,8 +3,15 @@
 
 <div class="stack">
   <div class="card">
-    <h1>Nouvelle dépense</h1>
-    <p class="muted">Choix : subvention → compte → ligne → dépense. Justificatif non obligatoire pour le moment.</p>
+    <div class="card-header">
+      <div>
+        <h1 class="card-title">Nouvelle dépense</h1>
+        <p class="card-subtitle">Choix : subvention → compte → ligne → dépense. Justificatif non obligatoire pour le moment.</p>
+      </div>
+      <div class="inline">
+        <a class="btn" href="{{ url_for('budget.depenses_list') }}">Retour à la liste</a>
+      </div>
+    </div>
 
     <form method="POST">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -30,7 +37,8 @@
       <div class="spacer"></div>
 
       <div class="card" style="margin:0">
-        <h2 style="margin-top:0">📦 Inventaire (optionnel)</h2>
+        <h2 style="margin-top:0">Inventaire (optionnel)</h2>
+        <p class="muted">Ajoutez une entrée d’inventaire si la dépense correspond à un matériel.</p>
         <label class="inline" style="gap:8px; align-items:center">
           <input type="checkbox" name="create_inventory" value="1" id="createInv">
           Ajouter une entrée dans l’inventaire en même temps que la dépense
@@ -95,7 +103,7 @@
 
       <div class="row two">
         <div><label>Libellé (min 5 caractères)</label><input name="libelle" required></div>
-        <div><label>Montant (€) (doit être > 0)</label><input name="montant" type="number" step="0.01" value="0.01"></div>
+        <div><label>Montant (€) (doit être &gt; 0)</label><input name="montant" type="number" step="0.01" value="0.01"></div>
       </div>
 
       <div class="spacer"></div>
