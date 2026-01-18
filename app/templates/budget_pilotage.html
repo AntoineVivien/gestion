@@ -3,8 +3,16 @@
 
 <div class="stack">
   <div class="card">
-    <h1>Pilotage</h1>
-    <p><strong>{{ sub.nom }}</strong> · {{ sub.secteur }} · {{ sub.annee_exercice }}</p>
+    <div class="card-header">
+      <div>
+        <h1 class="card-title">Pilotage</h1>
+        <p class="card-subtitle"><strong>{{ sub.nom }}</strong> · {{ sub.secteur }} · {{ sub.annee_exercice }}</p>
+      </div>
+      <div class="inline">
+        <a class="btn" href="{{ url_for('main.subventions_list') }}">Retour aux subventions</a>
+        <a class="btn" href="{{ url_for('main.subvention_bilan', subvention_id=sub.id) }}">Voir le bilan</a>
+      </div>
+    </div>
 
     {% if warnings and warnings|length %}
       <div class="spacer"></div>
@@ -35,7 +43,8 @@
 
   <div class="grid two">
     <div class="card">
-      <h2>Montants (dossier → réalité)</h2>
+      <h2>Montants principaux</h2>
+      <p class="muted">Mettez à jour les montants du dossier pour refléter la réalité.</p>
 
       <form method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -133,7 +142,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="lignes-budget">
     <h2>Lignes de budget</h2>
     <p class="muted">
       Astuce : “Théorique reçu/attribué” ne modifie rien, c’est juste un repère.  
@@ -238,7 +247,7 @@
 
           {% if sub.lignes|length == 0 %}
             <tr>
-              <td colspan="9" class="muted">Aucune ligne. Ajoute au moins une ligne pour pouvoir ventiler.</td>
+              <td colspan="10" class="muted">Aucune ligne. Ajoute au moins une ligne pour pouvoir ventiler.</td>
             </tr>
           {% endif %}
         </tbody>
