@@ -8,13 +8,13 @@
 
 <div class="stack">
   <div class="card">
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+    <div class="card-header">
       <div>
-        <h1 style="margin:0;">Dashboard</h1>
-        <p class="muted" style="margin:6px 0 0 0;">Vue synthèse · Période activité : {{ days or 90 }} jours</p>
+        <h1 class="card-title">Tableau de bord</h1>
+        <p class="card-subtitle">Vue synthèse · Période activité : {{ days or 90 }} jours</p>
       </div>
 
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <div class="inline">
         <a class="btn" href="{{ url_for('main.dashboard', days=30) }}">30j</a>
         <a class="btn" href="{{ url_for('main.dashboard', days=90) }}">90j</a>
         <a class="btn" href="{{ url_for('main.dashboard', days=365) }}">12 mois</a>
@@ -61,20 +61,45 @@
     {% endif %}
   </div>
 
-  {# Raccourcis #}
   <div class="card">
-    <h2 style="margin-top:0;">Raccourcis</h2>
+    <h2 style="margin-top:0;">Actions rapides</h2>
+    <p class="muted" style="margin-top:0;">Choisissez une action pour commencer votre journée.</p>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      {% for sc in (shortcuts or []) %}
-        <a class="btn" href="{{ sc.url }}" style="display:inline-flex; align-items:center; gap:8px;">
-          <span aria-hidden="true">{{ sc.icon or "➡️" }}</span>
-          <span>{{ sc.label }}</span>
-        </a>
-      {% endfor %}
+      {% if shortcuts and shortcuts|length %}
+        {% for sc in shortcuts %}
+          <a class="btn" href="{{ sc.url }}" style="display:inline-flex; align-items:center; gap:8px;">
+            <span aria-hidden="true">{{ sc.icon or "➡️" }}</span>
+            <span>{{ sc.label }}</span>
+          </a>
+        {% endfor %}
+      {% else %}
+        <p class="muted">Aucune action disponible pour votre profil.</p>
+      {% endif %}
     </div>
   </div>
 
   {% if mode != "admin_tech" %}
+  <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:12px;">
+    <div class="card">
+      <h2 style="margin-top:0;">Alertes à vérifier</h2>
+      <p class="muted" style="margin-top:0;">Priorisez ces points avant d’avancer.</p>
+      {% if alerts and alerts|length %}
+        <ul style="margin:0; padding-left:18px;">
+          {% for a in alerts %}
+            <li style="margin:8px 0;">
+              <a href="{{ a.url or '#' }}" style="text-decoration:none;">
+                {% if a.level == 'danger' %}🔴{% elif a.level == 'warning' %}🟠{% else %}ℹ️{% endif %}
+                {{ a.text }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">Aucune alerte : tout est à jour.</p>
+      {% endif %}
+    </div>
+  </div>
+
   <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:12px;">
 
     <div class="card">
@@ -104,24 +129,6 @@
   </div>
 
   <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:12px;">
-    <div class="card">
-      <h2 style="margin-top:0;">Alertes</h2>
-      {% if alerts and alerts|length %}
-        <ul style="margin:0; padding-left:18px;">
-          {% for a in alerts %}
-            <li style="margin:8px 0;">
-              <a href="{{ a.url or '#' }}" style="text-decoration:none;">
-                {% if a.level == 'danger' %}🔴{% elif a.level == 'warning' %}🟠{% else %}ℹ️{% endif %}
-                {{ a.text }}
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="muted">Aucune alerte détectée. (Ça, c’est beau.) ✨</p>
-      {% endif %}
-    </div>
-
     <div class="card">
       <h2 style="margin-top:0;">Récents</h2>
 
