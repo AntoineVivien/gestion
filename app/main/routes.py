@@ -59,6 +59,7 @@ from app.rbac import require_perm, can, can_access_secteur
 from app.extensions import db
 from app.models import Subvention, LigneBudget, Depense, Projet, SubventionProjet, AtelierActivite, SessionActivite, PresenceActivite, ProjetAtelier, ProjetIndicateur
 from app.services.dashboard_service import build_dashboard_context
+from app.utils.money import as_decimal, quantize_money
 
 bp = Blueprint("main", __name__)
 
@@ -78,22 +79,22 @@ def _compute_prorata(lignes, montant_cible: float):
     if not lignes:
         return out
 
-    total_base = sum(float(l.montant_base or 0) for l in lignes)
+    total_base = as_decimal(sum(float(l.montant_base or 0) for l in lignes))
     if total_base <= 0:
         for l in lignes:
             out[l.id] = 0.0
         return out
 
-    ratio = float(montant_cible or 0) / total_base
+    ratio = as_decimal(montant_cible or 0) / total_base
 
-    cumul = 0.0
+    cumul = as_decimal(0)
     for i, l in enumerate(lignes):
-        base = float(l.montant_base or 0)
-        part = round(base * ratio, 2)
+        base = as_decimal(l.montant_base or 0)
+        part = quantize_money(base * ratio)
         if i == len(lignes) - 1:
-            part = round(float(montant_cible or 0) - cumul, 2)
+            part = quantize_money(as_decimal(montant_cible or 0) - cumul)
         out[l.id] = float(part)
-        cumul += float(part)
+        cumul += part
 
     return out
 
