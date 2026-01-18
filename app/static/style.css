@@ -201,6 +201,13 @@ th{
 }
 
 .inline{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.row{ display:grid; gap:10px; grid-template-columns:1fr; }
+.row.two{ grid-template-columns:1fr; }
+.row.three{ grid-template-columns:1fr; }
+@media (min-width: 980px){
+  .row.two{ grid-template-columns:1fr 1fr; }
+  .row.three{ grid-template-columns:1fr 1fr 1fr; }
+}
 .card-header{
   display:flex;
   align-items:center;

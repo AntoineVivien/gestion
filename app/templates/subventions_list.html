@@ -3,8 +3,17 @@
 
 <div class="stack">
   <div class="card">
-    <h1>Subventions</h1>
-    <p>Liste des subventions non archivées.</p>
+    <div class="card-header">
+      <div>
+        <h1 class="card-title">Subventions</h1>
+        <p class="card-subtitle">Liste des subventions non archivées.</p>
+      </div>
+      {% if can("subventions:edit") %}
+        <div class="inline">
+          <a class="btn ok" href="#create-subvention">Créer une subvention</a>
+        </div>
+      {% endif %}
+    </div>
 
     <div class="tablewrap">
       <table>
@@ -17,27 +26,40 @@
           </tr>
         </thead>
         <tbody>
-          {% for s in subs %}
+          {% if subs and subs|length %}
+            {% for s in subs %}
+              <tr>
+                <td>{{ s.annee_exercice }}</td>
+                <td>{{ s.secteur }}</td>
+                <td><strong>{{ s.nom }}</strong></td>
+                <td>{{ "%.2f"|format(s.montant_demande or 0) }}€</td>
+                <td>{{ "%.2f"|format(s.montant_attribue or 0) }}€</td>
+                <td>{{ "%.2f"|format(s.montant_recu or 0) }}€</td>
+                <td>{{ "%.2f"|format(s.total_reel_lignes or 0) }}€</td>
+                <td>{{ "%.2f"|format(s.total_engage or 0) }}€</td>
+                <td>{{ "%.2f"|format(s.total_reste or 0) }}€</td>
+                <td>
+                  {% if can("subventions:edit") %}
+                    <a class="btn" href="{{ url_for('main.subvention_pilotage', subvention_id=s.id) }}">Ouvrir</a>
+                  {% else %}
+                    <span class="muted">Lecture seule</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
             <tr>
-              <td>{{ s.annee_exercice }}</td>
-              <td>{{ s.secteur }}</td>
-              <td><strong>{{ s.nom }}</strong></td>
-              <td>{{ "%.2f"|format(s.montant_demande or 0) }}€</td>
-              <td>{{ "%.2f"|format(s.montant_attribue or 0) }}€</td>
-              <td>{{ "%.2f"|format(s.montant_recu or 0) }}€</td>
-              <td>{{ "%.2f"|format(s.total_reel_lignes or 0) }}€</td>
-              <td>{{ "%.2f"|format(s.total_engage or 0) }}€</td>
-              <td>{{ "%.2f"|format(s.total_reste or 0) }}€</td>
-              <td>{% if can("subventions:edit") %}<a class="btn" href="{{ url_for('main.subvention_pilotage', subvention_id=s.id) }}">Pilotage</a>{% else %}<span class="muted">Lecture seule</span>{% endif %}</td>
+              <td colspan="10" class="muted">Aucune subvention active pour le moment.</td>
             </tr>
-          {% endfor %}
+          {% endif %}
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="create-subvention">
     <h2>Créer une subvention</h2>
+    <p class="muted">Renseignez les montants principaux. Vous pourrez compléter le pilotage ensuite.</p>
 
     <form method="POST" action="{{ url_for('main.subvention_create') }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
