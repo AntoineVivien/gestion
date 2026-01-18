@@ -164,6 +164,23 @@ th{
 /* ---------- 8) UI HELPERS ---------- */
 .muted{ color: var(--muted); }
 
+/* ---------- 8b) LAYOUT BASICS ---------- */
+.card{
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  box-shadow: var(--shadow);
+}
+
+.grid{ display:grid; gap:14px; }
+.grid.two{ grid-template-columns:1fr; }
+@media (min-width: 980px){
+  .grid.two{ grid-template-columns:1fr 1fr; }
+}
+
+.inline{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
 /* (Optionnel) petit switch qui peut être dans le layout */
 .theme-switch{
   display:flex;
@@ -189,7 +206,7 @@ th{
 }
 
 /* Conteneur des cards: faut que ça wrap */
-.cards, .card-grid, .grid, .dashboard-grid {
+.cards, .card-grid, .dashboard-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
